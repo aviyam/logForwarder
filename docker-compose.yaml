@@ -1,0 +1,34 @@
+services:
+  logforwarder:
+    build: .
+    ports:
+      - "5044:5044"
+      - "24224:24224"
+    networks:
+      - logging
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.12.0
+    volumes:
+      - ./test/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./test/test.log:/tmp/test.log
+    depends_on:
+      - logforwarder
+    networks:
+      - logging
+    user: root # To avoid permission issues with /tmp/test.log
+
+  fluentd:
+    image: fluent/fluentd:v1.16-1
+    volumes:
+      - ./test/config/fluent.conf:/fluentd/etc/fluent.conf:ro
+    ports:
+      - "8888:8888" # Fluentd HTTP input
+    depends_on:
+      - logforwarder
+    networks:
+      - logging
+
+networks:
+  logging:
+    driver: bridge
