@@ -1,4 +1,4 @@
-# Log Forwarder in Go
+# Log Forwarder
 
 A lightweight, containerized Go application that acts as a log collector and forwarder. It receives logs from **Filebeat** (Lumberjack v2) and **Fluentd/Fluent Bit** (Forward protocol) and writes them directly to `stdout` as JSON.
 
