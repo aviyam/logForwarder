@@ -49,7 +49,10 @@ func (s *FluentServer) Start(ctx context.Context) error {
 				slog.Error("failed to accept fluent connection", "error", err)
 				continue
 			}
-			go s.handleConnection(conn)
+			go func(c net.Conn) {
+				slog.Debug("accepted fluent connection", "remote_addr", c.RemoteAddr())
+				s.handleConnection(c)
+			}(conn)
 		}
 	}()
 
@@ -64,6 +67,7 @@ func (s *FluentServer) handleConnection(conn net.Conn) {
 		var msg []any
 		if err := decoder.Decode(&msg); err != nil {
 			if errors.Is(err, io.EOF) {
+				slog.Debug("fluent connection closed by client", "remote_addr", conn.RemoteAddr())
 				return
 			}
 			slog.Error("failed to decode fluent message", "error", err)
@@ -75,14 +79,13 @@ func (s *FluentServer) handleConnection(conn net.Conn) {
 			continue
 		}
 
-		// Fluentd Forward Protocol v1: [tag, entries, option] or [tag, time, record, option]
-		// entries can be [[time, record], [time, record], ...]
-		
 		tag, ok := msg[0].(string)
 		if !ok {
 			slog.Warn("received invalid fluent message (tag is not string)")
 			continue
 		}
+
+		slog.Debug("received fluent message", "tag", tag, "remote_addr", conn.RemoteAddr())
 
 		switch entries := msg[1].(type) {
 		case []any:

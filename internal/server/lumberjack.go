@@ -44,12 +44,14 @@ func (s *LumberjackServer) Start(ctx context.Context) error {
 				if !ok {
 					return
 				}
+				slog.Debug("received lumberjack batch", "count", len(batch.Events))
 				for _, event := range batch.Events {
 					record, ok := event.(map[string]any)
 					if !ok {
 						slog.Warn("received invalid lumberjack event", "type", fmt.Sprintf("%T", event))
 						continue
 					}
+					slog.Debug("processing lumberjack record")
 					if err := s.handler.Write(output.Record(record)); err != nil {
 						slog.Error("failed to write output record", "error", err)
 					}

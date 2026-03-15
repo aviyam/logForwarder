@@ -2,6 +2,7 @@ package output
 
 import (
 	"encoding/json"
+	"log/slog"
 	"os"
 	"sync"
 )
@@ -24,6 +25,7 @@ func NewHandler() *Handler {
 
 // Write writes a record to stdout as JSON.
 func (h *Handler) Write(record Record) error {
+	slog.Debug("writing record to output", "record", record)
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	return h.encoder.Encode(record)

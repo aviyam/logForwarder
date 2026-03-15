@@ -13,9 +13,39 @@ import (
 )
 
 func main() {
-	// Configure internal logger to write to stderr
-	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
+	// Configure internal logger
+	logLevel := getEnv("LOG_LEVEL", "info")
+	logFormat := getEnv("LOG_FORMAT", "json")
+
+	var level slog.Level
+	switch logLevel {
+	case "debug":
+		level = slog.LevelDebug
+	case "info":
+		level = slog.LevelInfo
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	default:
+		level = slog.LevelInfo
+	}
+
+	opts := &slog.HandlerOptions{
+		Level: level,
+	}
+
+	var logHandler slog.Handler
+	if logFormat == "text" {
+		logHandler = slog.NewTextHandler(os.Stderr, opts)
+	} else {
+		logHandler = slog.NewJSONHandler(os.Stderr, opts)
+	}
+
+	logger := slog.New(logHandler)
 	slog.SetDefault(logger)
+
+	slog.Info("starting logforwarder", "level", logLevel, "format", logFormat)
 
 	handler := output.NewHandler()
 	ctx, cancel := context.WithCancel(context.Background())
