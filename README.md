@@ -19,7 +19,7 @@ This is ideal for containerized environments where you want to consolidate logs 
 ### Prerequisites
 
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- [Go 1.24+](https://golang.org/) (if building locally)
+- [Go 1.25+](https://golang.org/) (if building locally)
 
 ### Running with Docker
 
@@ -39,7 +39,9 @@ Configuration is handled via environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `LUMBERJACK_ENABLED` | Set to `true` to enable the Lumberjack server | `false` |
 | `LUMBERJACK_ADDR` | TCP address to listen for Filebeat logs | `:5044` |
+| `FLUENT_ENABLED` | Set to `true` to enable the Fluent Forward server | `false` |
 | `FLUENT_ADDR` | TCP address to listen for Fluentd logs | `:24224` |
 
 ## Testing the Setup

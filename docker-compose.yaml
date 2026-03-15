@@ -1,6 +1,9 @@
 services:
   logforwarder:
     build: .
+    environment:
+      - LUMBERJACK_ENABLED=true
+      - FLUENT_ENABLED=true
     ports:
       - "5044:5044"
       - "24224:24224"
